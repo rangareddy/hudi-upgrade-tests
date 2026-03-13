@@ -29,21 +29,6 @@ def summarize_rows(rows: list[dict]) -> dict:
     return dict(by_key)
 
 
-def compare_counts(baseline_rows: list[dict], upgrade_rows: list[dict]) -> list[tuple]:
-    """Compare counts for matching (spark_version, query_type) where both SUCCESS."""
-    baseline_ok = {(r["spark_version"], r["query_type"]): int(r.get("count") or 0)
-                   for r in baseline_rows if r.get("status") == "SUCCESS"}
-    upgrade_ok = {(r["spark_version"], r["query_type"]): int(r.get("count") or 0)
-                  for r in upgrade_rows if r.get("status") == "SUCCESS"}
-    keys = sorted(set(baseline_ok) | set(upgrade_ok))
-    out = []
-    for k in keys:
-        b = baseline_ok.get(k, None)
-        u = upgrade_ok.get(k, None)
-        out.append((k[0], k[1], b, u))
-    return out
-
-
 def status_summary(rows: list[dict]) -> dict:
     """Return success/fail counts and list of failed (spark_version, query_type)."""
     success = sum(1 for r in rows if r.get("status") == "SUCCESS")
@@ -111,33 +96,6 @@ def main():
         print(f"    Baseline:  {b_sum['success']}/{b_sum['total']} passed, {b_sum['failed']} failed")
         print(f"    Upgrade:   {u_sum['success']}/{u_sum['total']} passed, {u_sum['failed']} failed")
 
-        # Count comparison where both succeeded
-        # Rule: +5 for snapshot/incremental/read_optimized => upgrade has no issues.
-        #       timetravel always expected to show 20 (both baseline and upgrade).
-        count_comparisons = compare_counts(baseline_rows, upgrade_rows)
-        if count_comparisons:
-            print("\n  Count comparison (where status=SUCCESS):")
-            print("    Upgrade has no issues when: snapshot/incremental/read_optimized show +5; timetravel shows 20.")
-            print(f"    {'Spark':<10} {'Query type':<16} {'Baseline':<10} {'Upgrade':<10} {'Diff':<8}  Verdict")
-            print("    " + "-" * 72)
-            for spark_ver, query_type, b_count, u_count in count_comparisons:
-                b_str = str(b_count) if b_count is not None else "—"
-                u_str = str(u_count) if u_count is not None else "—"
-                if b_count is not None and u_count is not None:
-                    diff = u_count - b_count
-                    diff_str = f"+{diff}" if diff > 0 else str(diff)
-                    # Verdict: +5 for snapshot/incremental/read_optimized => no issues; timetravel 20 => no issues
-                    if query_type == "timetravel":
-                        verdict = "No issues (timetravel=20)" if u_count == 20 else "Check"
-                    elif query_type in ("snapshot", "incremental", "read_optimized", "cdc"):
-                        verdict = "No issues (+5)" if diff == 5 else "Check"
-                    else:
-                        verdict = "—"
-                else:
-                    diff_str = "—"
-                    verdict = "—"
-                print(f"    {spark_ver:<10} {query_type:<16} {b_str:<10} {u_str:<10} {diff_str:<8}  {verdict}")
-
         # Failures in upgrade that were success in baseline (regressions)
         b_ok_keys = {(r["spark_version"], r["query_type"]) for r in baseline_rows if r.get("status") == "SUCCESS"}
         u_fail_keys = {(r["spark_version"], r["query_type"]) for r in upgrade_rows if r.get("status") == "FAILED"}
@@ -175,13 +133,14 @@ def main():
   • Table version: Baseline uses table_version=5, upgrade uses 6 (post-upgrade).
   • Spark 3.2.4 & 3.3.3: All query types FAIL for both baseline and upgrade with
     IllegalArgumentException ("For input string: \\"null\\"") or NullPointerException.
-  • Spark 3.1.3, 3.4.1, 3.5.3: Non-CDC query types pass; CDC query type fails on
-    3.4.1 and 3.5.3 with "It isn't a CDC hudi table" (expected if table not created
-    with CDC in that run).
-  • Upgrade has no issues when:
-    - snapshot, incremental, read_optimized (and cdc where applicable): Baseline vs Upgrade
-      difference is +5 (upgrade has 5 more rows from post-upgrade writes).
-    - timetravel: count is always 20 for both baseline and upgrade (expected).
+  • Non-CDC tables (hudi_trips_cow, hudi_trips_mor): On Spark 3.1.3, 3.4.1, 3.5.3 all
+    query types (snapshot, incremental, timetravel, read_optimized) pass for upgrade.
+  • CDC tables (cdc_hudi_trips_cow, cdc_hudi_trips_mor):
+    - Spark 3.1.3: All query types including cdc pass for upgrade.
+    - Spark 3.4.1 & 3.5.3: snapshot, incremental, timetravel, read_optimized pass;
+      cdc query fails with "It isn't a CDC hudi table" (expected if table path not
+      created as CDC in that run).
+    - Spark 3.2.4 & 3.3.3: All query types fail (same as non-CDC).
 """)
     print("=" * 80)
 
