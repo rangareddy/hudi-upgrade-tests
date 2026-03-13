@@ -112,15 +112,7 @@ main() {
                   "${TABLE_TYPE}" "${IS_CDC}" "upgrade"
     done
     
-    # Final summary
-    log "🎉 UPGRADE TEST PIPELINE COMPLETE!"
-    log "📈 Check CSV files: hudi_*_${TABLE_TYPE}_table_*.csv"
-    log "📁 Table location: ${WORKING_DIR}/*${TABLE_TYPE}*"
-    
-    echo
-    echo "Generated CSV files:"
-    ls -la /tmp/hudi_*_${TABLE_TYPE}*.csv 2>/dev/null || true
-    echo
+    echo "Results directory: ${WORKING_DIR}/results"
     success "Pipeline finished successfully!"
 }
 
