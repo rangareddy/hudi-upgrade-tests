@@ -112,8 +112,7 @@ main() {
                   "${TABLE_TYPE}" "${IS_CDC}" "upgrade"
     done
     
-    echo "Results directory: ${WORKING_DIR}/results"
-    success "Pipeline finished successfully!"
+    success "End to end hudi upgrade test completed successfully and results are stored in the directory: ${WORKING_DIR}/results!"
 }
 
 # Main execution
