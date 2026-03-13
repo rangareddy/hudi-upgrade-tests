@@ -224,7 +224,7 @@ def execute_query(spark, basePath, queryType, instantTime):
 # Run Query Validation
 ############################################
 
-def run_validation(run_timestamp, spark, basePath, query_types, beginInstant,
+def run_validation(spark, basePath, query_types, beginInstant,
                    spark_version, hudi_version, table_version,
                    tableType, tableName, is_cdc_table, run_mode):
     """Run all query types and collect results"""
@@ -236,7 +236,6 @@ def run_validation(run_timestamp, spark, basePath, query_types, beginInstant,
         )
 
         results.append({
-            "run_timestamp": run_timestamp,
             "run_mode": run_mode,
             "spark_version": spark_version,
             "hudi_version": hudi_version,
@@ -265,10 +264,10 @@ def print_results(results):
     print("🚀 HUDI UPGRADE QUERY VALIDATION RESULTS")
     print("="*180)
 
-    row_format = "| {:<19} | {:<10} | {:<13} | {:<12} | {:<13} | {:<20} | {:<6} | {:<15} | {:<8} | {:<8} | {:<50} |"
+    row_format = "| {:<10} | {:<13} | {:<12} | {:<13} | {:<20} | {:<6} | {:<15} | {:<8} | {:<8} | {:<50} |"
     
     header = row_format.format(
-        "run_timestamp", "run_mode", "spark_version", "hudi_version", 
+        "run_mode", "spark_version", "hudi_version", 
         "table_version", "table_type", "is_cdc", "query_type", 
         "status", "count", "error_message"
     )
@@ -281,7 +280,6 @@ def print_results(results):
     for r in results:
         error_msg = r["error_message"][:47] + "..." if len(r["error_message"]) > 50 else r["error_message"]
         print(row_format.format(
-            r["run_timestamp"][:19],
             r["run_mode"],
             r["spark_version"],
             r["hudi_version"],
@@ -340,7 +338,6 @@ def main():
     spark_version = spark.version
     hudi_version = get_hudi_version(spark)
     table_version = get_table_version(spark, basePath)
-    run_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     query_types = get_query_types(is_mor_table, is_cdc_table)
     beginInstant = get_begin_instant(spark, basePath)
 
@@ -351,14 +348,11 @@ def main():
     logger.info(f"Path: {basePath} | Queries: {query_types}")
     logger.info("="*60)
     
-    # Run tests
     results = run_validation(
-        run_timestamp, spark, basePath, query_types, beginInstant,
+        spark, basePath, query_types, beginInstant,
         spark_version, hudi_version, table_version,
         tableType, tableName, is_cdc_table, run_mode
     )
-
-    # Output
     spark.stop()
     print_results(results)
     csv_file = write_results_to_csv(tableName, run_mode, results)
