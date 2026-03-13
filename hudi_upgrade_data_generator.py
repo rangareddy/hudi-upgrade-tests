@@ -194,15 +194,12 @@ def run_cdc_query(spark, base_path, is_cdc_enabled):
     log("Running CDC query")
 
     cdc_df = spark.read.format("hudi") \
-        .option("hoodie.datasource.query.type", "cdc") \
+        .option("hoodie.datasource.query.incremental.format", "cdc") \
+        .option("hoodie.datasource.query.type", "incremental") \
+        .option("hoodie.datasource.read.begin.instanttime", "0") \
         .load(base_path)
 
-    cdc_df.select(
-        "_hoodie_commit_time",
-        "_hoodie_operation",
-        "uuid",
-        "marker_col"
-    ).show(truncate=False)
+    cdc_df.show(truncate=False)
 
 
 ############################################
