@@ -150,11 +150,9 @@ def run_cdc_query(spark, base_path, is_cdc_enabled):
             .option("hoodie.datasource.read.begin.instanttime", "0") \
             .option("hoodie.datasource.query.incremental.format", "cdc") \
             .load(base_path)
-        
         cdc_count = cdc_df.count()
         logger.info(f"✅ CDC query success: {cdc_count} change records")
         cdc_df.show(10, truncate=False)
-        
     except Exception as e:
         logger.error(f"❌ CDC query failed (non-critical): {str(e)}")
         logger.error("This is expected if table lacks CDC data or config")

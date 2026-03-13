@@ -184,33 +184,31 @@ def extract_root_java_exception(error):
 def execute_query(spark, basePath, queryType, instantTime):
     """Execute specific Hudi query type"""
     try:
-        if queryType == "snapshot":
-            df = spark.read.format("hudi").load(basePath)
-
-        elif queryType == "read_optimized":
-            df = spark.read.format("hudi") \
-                .option("hoodie.datasource.query.type", "read_optimized") \
-                .load(basePath)
-
+        read_options = {}
+        if queryType == "read_optimized":
+            read_options.update({
+                'hoodie.datasource.query.type': 'read_optimized',
+            })
         elif queryType == "incremental":
-            df = spark.read.format("hudi") \
-                .option("hoodie.datasource.query.type", "incremental") \
-                .option("hoodie.datasource.read.begin.instanttime", instantTime) \
-                .load(basePath)
-
+            read_options.update({
+                'hoodie.datasource.query.type': 'incremental',
+                'hoodie.datasource.read.begin.instanttime': instantTime,
+            })
         elif queryType == "cdc":
-            df = spark.read.format("hudi") \
-                .option("hoodie.datasource.query.incremental.format", "cdc") \
-                .option("hoodie.datasource.query.type", "incremental") \
-                .option("hoodie.datasource.read.begin.instanttime", instantTime) \
-                .load(basePath)
-
+            read_options.update({
+                'hoodie.datasource.query.incremental.format': 'cdc',
+                'hoodie.datasource.query.type': 'incremental',
+                'hoodie.datasource.read.begin.instanttime': 0,
+            })
         elif queryType == "timetravel":
-            df = spark.read.format("hudi") \
-                .option("as.of.instant", instantTime) \
-                .load(basePath)
+            read_options.update({
+                'as.of.instant': instantTime,
+            })
+        
+        if read_options:
+            df = spark.read.format("hudi").options(**read_options).load(basePath)
         else:
-            raise ValueError(f"Unknown query type: {queryType}")
+            df = spark.read.format("hudi").load(basePath)
         count = df.count()
         logger.info(f"✅ {queryType}: {count} rows")
         return "SUCCESS", "", count
