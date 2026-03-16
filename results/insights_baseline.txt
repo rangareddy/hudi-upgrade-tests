@@ -34,15 +34,15 @@ HUDI UPGRADE TEST — Baseline vs Upgrade Insights
     Rules: timetravel=20; snapshot/ro/cdc = U=B+5 or U=B+5-3 (delete count 3); incremental = U=B+5 or U in [B+2,B+4]
     Spark      Query type       Baseline   Upgrade    Count OK?
     ----------------------------------------------------------------------
-    3.1.3      cdc              20         22         ✓
+    3.1.3      cdc              20         25         ✓
     3.1.3      incremental      6          11         ✓
-    3.1.3      snapshot         20         22         ✓
+    3.1.3      snapshot         20         25         ✓
     3.1.3      timetravel       20         20         ✓
     3.4.1      incremental      6          11         ✓
-    3.4.1      snapshot         20         22         ✓
+    3.4.1      snapshot         20         25         ✓
     3.4.1      timetravel       20         20         ✓
     3.5.3      incremental      6          11         ✓
-    3.5.3      snapshot         20         22         ✓
+    3.5.3      snapshot         20         25         ✓
     3.5.3      timetravel       20         20         ✓
 
   Status summary:
@@ -59,17 +59,17 @@ HUDI UPGRADE TEST — Baseline vs Upgrade Insights
   Upgrade comparison (all Spark versions):
     Spark      Query type       Upgrade Status Any message
     ------------------------------------------------------------------------------------------
-    3.1.3      cdc              FAILED         java.lang.ClassCastException: class java.lang.Float cannot be cast to…
-    3.1.3      incremental      FAILED         java.lang.NullPointerException
+    3.1.3      cdc              SUCCESS        
+    3.1.3      incremental      SUCCESS        
     3.1.3      read_optimized   SUCCESS        
-    3.1.3      snapshot         FAILED         java.lang.ClassCastException: class java.lang.Float cannot be cast to…
-    3.1.3      timetravel       FAILED         java.lang.NullPointerException
-    3.2.4      cdc              FAILED         java.lang.ClassCastException: class java.lang.Float cannot be cast to…
+    3.1.3      snapshot         SUCCESS        
+    3.1.3      timetravel       SUCCESS        
+    3.2.4      cdc              FAILED         java.lang.IllegalArgumentException: For input string: "null"
     3.2.4      incremental      FAILED         java.lang.NullPointerException
     3.2.4      read_optimized   FAILED         java.lang.IllegalArgumentException: For input string: "null"
     3.2.4      snapshot         FAILED         java.lang.IllegalArgumentException: For input string: "null"
     3.2.4      timetravel       FAILED         java.lang.NullPointerException
-    3.3.3      cdc              FAILED         java.lang.ClassCastException: class java.lang.Float cannot be cast to…
+    3.3.3      cdc              FAILED         java.lang.IllegalArgumentException: For input string: "null"
     3.3.3      incremental      FAILED         java.lang.NullPointerException
     3.3.3      read_optimized   FAILED         java.lang.IllegalArgumentException: For input string: "null"
     3.3.3      snapshot         FAILED         java.lang.IllegalArgumentException: For input string: "null"
@@ -89,25 +89,23 @@ HUDI UPGRADE TEST — Baseline vs Upgrade Insights
     Rules: timetravel=20; snapshot/ro/cdc = U=B+5 or U=B+5-3 (delete count 3); incremental = U=B+5 or U in [B+2,B+4]
     Spark      Query type       Baseline   Upgrade    Count OK?
     ----------------------------------------------------------------------
+    3.1.3      cdc              20         25         ✓
+    3.1.3      incremental      6          11         ✓
     3.1.3      read_optimized   20         25         ✓
-    3.4.1      incremental      6          9          ✓
+    3.1.3      snapshot         20         25         ✓
+    3.1.3      timetravel       20         20         ✓
+    3.4.1      incremental      6          11         ✓
     3.4.1      read_optimized   20         25         ✓
-    3.4.1      snapshot         20         22         ✓
+    3.4.1      snapshot         20         25         ✓
     3.4.1      timetravel       20         20         ✓
-    3.5.3      incremental      6          9          ✓
+    3.5.3      incremental      6          11         ✓
     3.5.3      read_optimized   20         25         ✓
-    3.5.3      snapshot         20         22         ✓
+    3.5.3      snapshot         20         25         ✓
     3.5.3      timetravel       20         20         ✓
 
   Status summary:
     Baseline:  13/25 passed, 12 failed
-    Upgrade:   9/25 passed, 16 failed
-
-  Regressions (passed in baseline, failed in upgrade):
-    3.1.3 / cdc: java.lang.ClassCastException: class java.lang.Float cannot…
-    3.1.3 / incremental: java.lang.NullPointerException
-    3.1.3 / snapshot: java.lang.ClassCastException: class java.lang.Float cannot…
-    3.1.3 / timetravel: java.lang.NullPointerException
+    Upgrade:   13/25 passed, 12 failed
 
   Baseline table version: 5
   Upgrade table version:  6
