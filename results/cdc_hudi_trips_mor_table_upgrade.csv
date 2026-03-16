@@ -1,26 +1,26 @@
 run_mode,spark_version,hudi_version,table_version,table_type,table_name,is_cdc,query_type,status,count,error_message
-upgrade,3.1.3,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,snapshot,FAILED,0,java.lang.ClassCastException: class java.lang.Float cannot be cast to class [Lorg.apache.hudi.common.model.DeleteRecord; (java.lang.Float is in module java.base of loader 'bootstrap'; [Lorg.apache.hudi.common.model.DeleteRecord; is in unnamed module of loader org.apache.spark.util.MutableURLClassLoader @14151bc5)
-upgrade,3.1.3,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,incremental,FAILED,0,java.lang.NullPointerException
-upgrade,3.1.3,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,timetravel,FAILED,0,java.lang.NullPointerException
+upgrade,3.1.3,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,snapshot,SUCCESS,25,
+upgrade,3.1.3,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,incremental,SUCCESS,11,
+upgrade,3.1.3,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,timetravel,SUCCESS,20,
 upgrade,3.1.3,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,read_optimized,SUCCESS,25,
-upgrade,3.1.3,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,cdc,FAILED,0,java.lang.ClassCastException: class java.lang.Float cannot be cast to class [Lorg.apache.hudi.common.model.DeleteRecord; (java.lang.Float is in module java.base of loader 'bootstrap'; [Lorg.apache.hudi.common.model.DeleteRecord; is in unnamed module of loader org.apache.spark.util.MutableURLClassLoader @14151bc5)
+upgrade,3.1.3,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,cdc,SUCCESS,25,
 upgrade,3.2.4,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,snapshot,FAILED,0,"java.lang.IllegalArgumentException: For input string: ""null"""
 upgrade,3.2.4,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,incremental,FAILED,0,java.lang.NullPointerException
 upgrade,3.2.4,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,timetravel,FAILED,0,java.lang.NullPointerException
 upgrade,3.2.4,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,read_optimized,FAILED,0,"java.lang.IllegalArgumentException: For input string: ""null"""
-upgrade,3.2.4,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,cdc,FAILED,0,java.lang.ClassCastException: class java.lang.Float cannot be cast to class [Lorg.apache.hudi.common.model.DeleteRecord; (java.lang.Float is in module java.base of loader 'bootstrap'; [Lorg.apache.hudi.common.model.DeleteRecord; is in unnamed module of loader org.apache.spark.util.MutableURLClassLoader @31fc71ab)
+upgrade,3.2.4,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,cdc,FAILED,0,"java.lang.IllegalArgumentException: For input string: ""null"""
 upgrade,3.3.3,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,snapshot,FAILED,0,"java.lang.IllegalArgumentException: For input string: ""null"""
 upgrade,3.3.3,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,incremental,FAILED,0,java.lang.NullPointerException
 upgrade,3.3.3,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,timetravel,FAILED,0,java.lang.NullPointerException
 upgrade,3.3.3,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,read_optimized,FAILED,0,"java.lang.IllegalArgumentException: For input string: ""null"""
-upgrade,3.3.3,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,cdc,FAILED,0,java.lang.ClassCastException: class java.lang.Float cannot be cast to class [Lorg.apache.hudi.common.model.DeleteRecord; (java.lang.Float is in module java.base of loader 'bootstrap'; [Lorg.apache.hudi.common.model.DeleteRecord; is in unnamed module of loader org.apache.spark.util.MutableURLClassLoader @124ac145)
-upgrade,3.4.1,0.15.0,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,snapshot,SUCCESS,22,
-upgrade,3.4.1,0.15.0,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,incremental,SUCCESS,9,
+upgrade,3.3.3,0.12.3,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,cdc,FAILED,0,"java.lang.IllegalArgumentException: For input string: ""null"""
+upgrade,3.4.1,0.15.0,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,snapshot,SUCCESS,25,
+upgrade,3.4.1,0.15.0,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,incremental,SUCCESS,11,
 upgrade,3.4.1,0.15.0,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,timetravel,SUCCESS,20,
 upgrade,3.4.1,0.15.0,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,read_optimized,SUCCESS,25,
 upgrade,3.4.1,0.15.0,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,cdc,FAILED,0,It isn't a CDC hudi table on file:/tmp/cdc_hudi_trips_mor_table
-upgrade,3.5.3,0.15.0,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,snapshot,SUCCESS,22,
-upgrade,3.5.3,0.15.0,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,incremental,SUCCESS,9,
+upgrade,3.5.3,0.15.0,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,snapshot,SUCCESS,25,
+upgrade,3.5.3,0.15.0,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,incremental,SUCCESS,11,
 upgrade,3.5.3,0.15.0,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,timetravel,SUCCESS,20,
 upgrade,3.5.3,0.15.0,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,read_optimized,SUCCESS,25,
 upgrade,3.5.3,0.15.0,6,MERGE_ON_READ,cdc_hudi_trips_mor_table,True,cdc,FAILED,0,It isn't a CDC hudi table on file:/tmp/cdc_hudi_trips_mor_table

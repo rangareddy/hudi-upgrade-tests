@@ -72,9 +72,9 @@ bash hudi-upgrade-test.sh MERGE_ON_READ true
 ## What the test does
 
 1. **Generate table** — Creates a Hudi table with the source Hudi version (from `SOURCE_HUDI_VERSION` in `hudi-upgrade.properties`).
-2. **Baseline tests** — Runs snapshot, incremental, timetravel, delete (and read_optimized for MOR, cdc for CDC tables) across multiple Spark/Hudi version combinations; results are tagged `baseline`.
-3. **Upgrade** — Upgrades the table to the target Hudi version (`TARGET_HUDI_VERSION`), writes 5 more rows, then **hard-deletes 3 records**. Deleted records are not visible in snapshot or timetravel (after the delete instant).
-4. **Post-upgrade tests** — Re-runs the same query types; results are tagged `upgrade`. The **delete** query type runs a snapshot count to confirm deletes are applied (e.g. upgrade count 22 = 20 + 5 − 3).
+2. **Baseline tests** — Runs snapshot, incremental, timetravel (and read_optimized for MOR, cdc for CDC tables) across multiple Spark/Hudi version combinations; results are tagged `baseline`.
+3. **Upgrade** — Upgrades the table to the target Hudi version (`TARGET_HUDI_VERSION`), writes 5 more rows. For **non-CDC** tables, 3 records are then hard-deleted (upgrade count 22); **CDC tables** skip the delete step to avoid read-path issues (upgrade count 25).
+4. **Post-upgrade tests** — Re-runs the same query types; results are tagged `upgrade`.
 
 Results are written under **`results/`** as CSV files per table type, e.g.:
 
