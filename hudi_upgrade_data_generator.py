@@ -2,7 +2,7 @@ import sys
 import time
 import logging
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import lit
+from pyspark.sql.functions import lit, col
 
 logger = logging.getLogger("hudi-upgrade-generator")
 logging.basicConfig(
@@ -90,6 +90,30 @@ def write_hudi(df, marker_value, base_path, hudi_options, mode):
         .save(base_path)
     logger.info("Writing data to hudi table completed")
 
+def run_delete_commit(spark, base_path, hudi_options, num_deletes=3):
+    """Delete a few records from the table (hard delete). Deleted records are not visible in
+    snapshot, read_optimized, or timetravel (after the delete instant); count checks validate this."""
+    logger.info("Reading table to select keys for delete")
+    df = spark.read.format("hudi").load(base_path)
+    # Hudi exposes partition path as _hoodie_partition_path or as data column partitionpath
+    cols = df.columns
+    if "partitionpath" in cols:
+        keys_df = df.select("uuid", "partitionpath").limit(num_deletes)
+    elif "_hoodie_partition_path" in cols:
+        keys_df = df.select(col("uuid"), col("_hoodie_partition_path").alias("partitionpath")).limit(num_deletes)
+    else:
+        logger.warning("No partition path column found; using uuid only for delete")
+        keys_df = df.select("uuid").limit(num_deletes)
+    delete_count = keys_df.count()
+    if delete_count == 0:
+        logger.warning("No rows to delete, skipping delete commit")
+        return
+    logger.info("Commit 4 → Deleting %d records", delete_count)
+    delete_options = {**hudi_options, "hoodie.datasource.write.operation": "delete"}
+    keys_df.write.format("hudi").options(**delete_options).mode("append").save(base_path)
+    logger.info("Delete commit completed")
+
+
 def run_initial_commits(spark, data_gen, converter, base_path, hudi_options):
     logger.info("Commit 1 → Inserts")
     inserts = list(converter(data_gen.generateInserts(20)))
@@ -106,6 +130,9 @@ def run_upgrade_commit(spark, data_gen, converter, base_path, hudi_options):
     inserts = list(converter(data_gen.generateInserts(5)))
     df = generate_dataframe(spark, inserts)
     write_hudi(df, "commit3_insert_upgrade", base_path, hudi_options, "append")
+
+    logger.info("Commit 4 → Deletes (a few records)")
+    run_delete_commit(spark, base_path, hudi_options, num_deletes=3)
 
 def run_snapshot_query(spark, base_path):
     logger.info("Running snapshot query")

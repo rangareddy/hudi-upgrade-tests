@@ -20,6 +20,7 @@ DATA_GENERATOR="${WORKING_DIR}/hudi_upgrade_data_generator.py"
 QUERY_TESTER="${WORKING_DIR}/hudi_upgrade_test_queries.py"
 TABLE_TYPE="${1:-COPY_ON_WRITE}"
 IS_CDC="${2:-false}"
+RESULTS_DIR="${WORKING_DIR}/results"
 
 # Load Hudi/Scala versions from properties file (reused by all scripts)
 PROPERTIES_FILE="${WORKING_DIR}/hudi-upgrade.properties"
@@ -95,6 +96,22 @@ main() {
               "${DATA_GENERATOR}" \
               "${TABLE_TYPE}" "${IS_CDC}" "init"
 
+    BASELINE="baseline"
+    if [ "$TABLE_TYPE" == "COPY_ON_WRITE" ]; then  
+        TABLE_NAME="hudi_trips_cow_table"
+    else
+        TABLE_NAME="hudi_trips_mor_table"
+    fi
+
+    if [ "$IS_CDC" == "true" ]; then
+        TABLE_NAME="cdc_${TABLE_NAME}"
+    fi
+
+    OUTPUT_FILE="${RESULTS_DIR}/${TABLE_NAME}_${BASELINE}.csv"
+    if [[ -f "$OUTPUT_FILE" ]]; then
+        rm "$OUTPUT_FILE"
+    fi
+
      # Step 2: Baseline tests (pre-upgrade)
     log "🔍 STEP 2: Baseline Query Tests (Pre-Upgrade)"
     for version_pair in "${all_versions[@]}"; do
@@ -102,14 +119,20 @@ main() {
         log "Spark ${spark_version} + Hudi ${hudi_version}"
         spark_run "${spark_version}" "${hudi_version}" "${SCALA_VERSION}" \
                   "${QUERY_TESTER}" \
-                  "${TABLE_TYPE}" "${IS_CDC}" "baseline"
+                  "${TABLE_TYPE}" "${IS_CDC}" $BASELINE
     done
 
+    UPGRADE="upgrade"   
+    OUTPUT_FILE="${RESULTS_DIR}/${TABLE_NAME}_${UPGRADE}.csv"
+
+    if [[ -f "$OUTPUT_FILE" ]]; then
+        rm "$OUTPUT_FILE"
+    fi
      # Step 3: UPGRADE Hudi table
     log "🔄 STEP 3: UPGRADE Hudi Table to ${TARGET_HUDI_VERSION}"
     spark_run "3.5" "${TARGET_HUDI_VERSION}" "${SCALA_VERSION}" \
               "${DATA_GENERATOR}" \
-              "${TABLE_TYPE}" "${IS_CDC}" "upgrade"
+              "${TABLE_TYPE}" "${IS_CDC}" "${UPGRADE}"
     
     # Step 4: Post-upgrade tests
     log "✅ STEP 4: Post-Upgrade Query Tests"
@@ -118,7 +141,7 @@ main() {
         log "Spark ${spark_version} + Hudi ${hudi_version}"
         spark_run "${spark_version}" "${hudi_version}" "${SCALA_VERSION}" \
                   "${QUERY_TESTER}" \
-                  "${TABLE_TYPE}" "${IS_CDC}" "upgrade"
+                  "${TABLE_TYPE}" "${IS_CDC}" "${UPGRADE}"
     done
     
     success "End to end hudi upgrade test completed successfully and results are stored in the directory: ${WORKING_DIR}/results!"

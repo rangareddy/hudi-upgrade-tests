@@ -121,11 +121,12 @@ def get_table_version(spark, basePath):
 ############################################
 
 def get_query_types(is_mor_table, is_cdc_table):
-    """Determine available query types"""
+    """Determine available query types. 'delete' = snapshot count to validate deletes are applied (fewer rows)."""
     query_types = [
         "snapshot",
         "incremental",
-        "timetravel"
+        "timetravel",
+        "delete",  # snapshot read to verify deleted records are not visible (count reflects hard deletes)
     ]
     if is_mor_table:
         query_types.append("read_optimized")
