@@ -53,7 +53,7 @@ def get_hudi_data_generator(spark):
     return data_gen, converter
 
 def get_hudi_options(table_name, is_cdc_enabled, table_type):
-    """✅ FIXED: Complete CDC configuration + table type"""
+    """Complete CDC configuration + table type"""
     options = {
         "hoodie.table.name": table_name,
         "hoodie.datasource.write.recordkey.field": "uuid",
@@ -95,7 +95,6 @@ def run_delete_commit(spark, base_path, hudi_options, num_deletes=3):
     snapshot, read_optimized, or timetravel (after the delete instant); count checks validate this."""
     logger.info("Reading table to select keys for delete")
     df = spark.read.format("hudi").load(base_path)
-    # Hudi exposes partition path as _hoodie_partition_path or as data column partitionpath
     cols = df.columns
     if "partitionpath" in cols:
         keys_df = df.select("uuid", "partitionpath").limit(num_deletes)
