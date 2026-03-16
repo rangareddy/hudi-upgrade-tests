@@ -21,9 +21,18 @@ QUERY_TESTER="${WORKING_DIR}/hudi_upgrade_test_queries.py"
 TABLE_TYPE="${1:-COPY_ON_WRITE}"
 IS_CDC="${2:-false}"
 
-SOURCE_HUDI_VERSION=0.12.3
-SCALA_VERSION=2.12
-TARGET_HUDI_VERSION=0.15.0
+# Load Hudi/Scala versions from properties file (reused by all scripts)
+PROPERTIES_FILE="${WORKING_DIR}/hudi-upgrade.properties"
+if [[ -f "$PROPERTIES_FILE" ]]; then
+  set -a
+  # shellcheck source=hudi-upgrade.properties
+  source "$PROPERTIES_FILE"
+  set +a
+else
+  SOURCE_HUDI_VERSION=0.12.3
+  SCALA_VERSION=2.12
+  TARGET_HUDI_VERSION=0.15.0
+fi
 
 log() { echo -e "${BLUE}[$(date '+%Y-%m-%d %H:%M:%S')]${NC} $*" >&2; }
 success() { echo -e "${GREEN}[SUCCESS]${NC} $*" >&2; }
