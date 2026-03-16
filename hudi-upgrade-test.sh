@@ -36,9 +36,9 @@ else
 fi
 
 log() { echo -e "${BLUE}[$(date '+%Y-%m-%d %H:%M:%S')]${NC} $*" >&2; }
-success() { echo -e "${GREEN}[SUCCESS]${NC} $*" >&2; }
-error() { echo -e "${RED}[ERROR]${NC} $*" >&2; }
-warn() { echo -e "${YELLOW}[WARN]${NC} $*" >&2; }
+success() { echo -e "${GREEN}[$(date '+%Y-%m-%d %H:%M:%S')][SUCCESS]${NC} $*" >&2; }
+error() { echo -e "${RED}[$(date '+%Y-%m-%d %H:%M:%S')][ERROR]${NC} $*" >&2; }
+warn() { echo -e "${YELLOW}[$(date '+%Y-%m-%d %H:%M:%S')][WARN]${NC} $*" >&2; }
 
 spark_run() {
     local spark_version="$1"
