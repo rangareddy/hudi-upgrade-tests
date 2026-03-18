@@ -133,11 +133,11 @@ def run_upgrade_commit(spark, data_gen, converter, base_path, hudi_options):
     # Skip hard delete for CDC tables: CDC MOR reader can throw ClassCastException (Float to DeleteRecord[])
     # when merge logic reads delete metadata. Non-CDC tables get 3 deletes → 22 rows; CDC stays at 25.
     is_cdc = hudi_options.get("hoodie.table.cdc.enabled", "").lower() == "true"
-    if is_cdc:
-        logger.info("Commit 4 → Skipping deletes (CDC table; hard delete not applied to avoid read path ClassCastException)")
-    else:
-        logger.info("Commit 4 → Deletes (a few records)")
-        run_delete_commit(spark, base_path, hudi_options, num_deletes=3)
+    #if is_cdc:
+    #    logger.info("Commit 4 → Skipping deletes (CDC table; hard delete not applied to avoid read path ClassCastException)")
+    #else:
+    logger.info("Commit 4 → Deletes (a few records)")
+    run_delete_commit(spark, base_path, hudi_options, num_deletes=3)
 
 def run_snapshot_query(spark, base_path):
     logger.info("Running snapshot query")
@@ -152,7 +152,7 @@ def run_snapshot_query(spark, base_path):
     """).show(10, False)
 
 def is_cdc_table_valid(spark, base_path):
-    """✅ NEW: Validate CDC table properties"""
+    """✅ Validate CDC table properties"""
     try:
         hoodie_props_path = f"{base_path}/.hoodie/hoodie.properties"
         props = spark.sparkContext.textFile(f"file://{hoodie_props_path}").collect()
@@ -164,7 +164,7 @@ def is_cdc_table_valid(spark, base_path):
         return False
 
 def run_cdc_query(spark, base_path, is_cdc_enabled):
-    """✅ FIXED: Safe CDC query with validation"""
+    """✅ Safe CDC query with validation"""
     if not is_cdc_enabled:
         logger.info("Skipping CDC query - CDC not requested")
         return
@@ -202,15 +202,14 @@ def main():
     elif mode == "upgrade":
         run_upgrade_commit(spark, data_gen, converter, base_path, hudi_options)
     
-    logger.info("Completed")
-    
-    # VALIDATION
+    logger.info("✅ Data generation completed successfully!")
+    logger.info("Validating the data....")
     run_snapshot_query(spark, base_path)
     run_cdc_query(spark, base_path, is_cdc_enabled)
-    
+    logger.info("✅ Data validation completed successfully!")
     logger.info("Stopping Spark")
     spark.stop()
-    logger.info("✅ Data generation completed successfully!")
+    
 
 if __name__ == "__main__":
     main()
