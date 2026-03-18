@@ -45,12 +45,9 @@ def read_arguments():
 
 def get_table_details(tableType, is_cdc_table):
     """Generate table name and path"""
-    if tableType == "COPY_ON_WRITE":
-        tableName = "hudi_trips_cow_table"
-    else:
-        tableName = "hudi_trips_mor_table"
-    if is_cdc_table:
-        tableName = f"cdc_{tableName}"
+    tableName = os.environ.get("TABLE_NAME")
+    if not tableName:
+        raise ValueError("TABLE_NAME environment variable is not set")
     basePath = f"/tmp/{tableName}"
     if not os.path.exists(basePath):
         logger.error(f"Table path does not exist: {basePath}")

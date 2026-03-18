@@ -35,6 +35,20 @@ else
   TARGET_HUDI_VERSION=0.15.0
 fi
 
+SOURCE_HUDI_VERSION_CLEAN=${SOURCE_HUDI_VERSION//./_}
+TARGET_HUDI_VERSION_CLEAN=${TARGET_HUDI_VERSION//./_}
+
+if [ "$TABLE_TYPE" == "COPY_ON_WRITE" ]; then  
+    TABLE_NAME="hudi_trips_cow_table_${SOURCE_HUDI_VERSION_CLEAN}_${TARGET_HUDI_VERSION_CLEAN}"
+else
+    TABLE_NAME="hudi_trips_mor_table_${SOURCE_HUDI_VERSION_CLEAN}_${TARGET_HUDI_VERSION_CLEAN}"
+fi
+
+if [ "$IS_CDC" == "true" ]; then
+    TABLE_NAME="cdc_${TABLE_NAME}"
+fi
+export TABLE_NAME
+
 log() { echo -e "${BLUE}[$(date '+%Y-%m-%d %H:%M:%S')]${NC} $*" >&2; }
 success() { echo -e "${GREEN}[$(date '+%Y-%m-%d %H:%M:%S')][SUCCESS]${NC} $*" >&2; }
 error() { echo -e "${RED}[$(date '+%Y-%m-%d %H:%M:%S')][ERROR]${NC} $*" >&2; }
@@ -89,7 +103,7 @@ main() {
     )
 
     local all_versions=("${baseline_versions[@]}" "${upgrade_versions[@]}")
-
+   
     # Step 1: Generate table with OLD Hudi
     log "📊 STEP 1: Generate table with Hudi ${SOURCE_HUDI_VERSION}"
     spark_run "3.1" "${SOURCE_HUDI_VERSION}" "${SCALA_VERSION}" \
@@ -97,16 +111,6 @@ main() {
               "${TABLE_TYPE}" "${IS_CDC}" "init"
 
     BASELINE="baseline"
-    if [ "$TABLE_TYPE" == "COPY_ON_WRITE" ]; then  
-        TABLE_NAME="hudi_trips_cow_table"
-    else
-        TABLE_NAME="hudi_trips_mor_table"
-    fi
-
-    if [ "$IS_CDC" == "true" ]; then
-        TABLE_NAME="cdc_${TABLE_NAME}"
-    fi
-
     OUTPUT_FILE="${RESULTS_DIR}/${TABLE_NAME}_${BASELINE}.csv"
     if [[ -f "$OUTPUT_FILE" ]]; then
         rm "$OUTPUT_FILE"

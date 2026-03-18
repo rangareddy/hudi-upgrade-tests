@@ -1,6 +1,7 @@
 import sys
 import time
 import logging
+import os
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import lit, col
 
@@ -32,13 +33,9 @@ def create_spark_session():
     return spark
 
 def get_table_details(table_type, is_cdc_enabled):
-    if table_type == "COPY_ON_WRITE":
-        table_name = "hudi_trips_cow_table"
-    else:
-        table_name = "hudi_trips_mor_table"
-
-    if is_cdc_enabled:
-        table_name = f"cdc_{table_name}"
+    table_name = os.environ.get("TABLE_NAME")
+    if not table_name:
+        raise ValueError("TABLE_NAME environment variable is not set")
 
     base_path = f"/tmp/{table_name}"
     logger.info(f"Table Name      : {table_name}")
