@@ -13,14 +13,14 @@ HUDI UPGRADE TEST — Baseline vs Upgrade Insights
     3.1.3      incremental      SUCCESS        
     3.1.3      snapshot         SUCCESS        
     3.1.3      timetravel       SUCCESS        
-    3.2.3      cdc              SUCCESS        
-    3.2.3      incremental      SUCCESS        
-    3.2.3      snapshot         SUCCESS        
-    3.2.3      timetravel       SUCCESS        
-    3.3.1      cdc              SUCCESS        
-    3.3.1      incremental      SUCCESS        
-    3.3.1      snapshot         SUCCESS        
-    3.3.1      timetravel       SUCCESS        
+    3.2.4      cdc              FAILED         java.lang.IllegalArgumentException: For input string: "null"
+    3.2.4      incremental      FAILED         java.lang.NullPointerException
+    3.2.4      snapshot         FAILED         java.lang.IllegalArgumentException: For input string: "null"
+    3.2.4      timetravel       FAILED         java.lang.NullPointerException
+    3.3.3      cdc              FAILED         java.lang.IllegalArgumentException: For input string: "null"
+    3.3.3      incremental      FAILED         java.lang.NullPointerException
+    3.3.3      snapshot         FAILED         java.lang.IllegalArgumentException: For input string: "null"
+    3.3.3      timetravel       FAILED         java.lang.NullPointerException
     3.4.1      cdc              FAILED         It isn't a CDC hudi table on file:/tmp/cdc_hudi_trips_cow_table_0_12_…
     3.4.1      incremental      SUCCESS        
     3.4.1      snapshot         SUCCESS        
@@ -38,14 +38,6 @@ HUDI UPGRADE TEST — Baseline vs Upgrade Insights
     3.1.3      incremental      6          11         ✓
     3.1.3      snapshot         20         22         ✓
     3.1.3      timetravel       20         20         ✓
-    3.2.3      cdc              20         22         ✓
-    3.2.3      incremental      6          11         ✓
-    3.2.3      snapshot         20         22         ✓
-    3.2.3      timetravel       20         20         ✓
-    3.3.1      cdc              20         22         ✓
-    3.3.1      incremental      6          11         ✓
-    3.3.1      snapshot         20         22         ✓
-    3.3.1      timetravel       20         20         ✓
     3.4.1      incremental      6          11         ✓
     3.4.1      snapshot         20         22         ✓
     3.4.1      timetravel       20         20         ✓
@@ -54,8 +46,8 @@ HUDI UPGRADE TEST — Baseline vs Upgrade Insights
     3.5.3      timetravel       20         20         ✓
 
   Status summary:
-    Baseline:  26/28 passed, 2 failed
-    Upgrade:   26/28 passed, 2 failed
+    Baseline:  10/20 passed, 10 failed
+    Upgrade:   10/20 passed, 10 failed
 
   Baseline table version: 5
   Upgrade table version:  6
@@ -72,16 +64,16 @@ HUDI UPGRADE TEST — Baseline vs Upgrade Insights
     3.1.3      read_optimized   SUCCESS        
     3.1.3      snapshot         FAILED         java.lang.ClassCastException: class java.lang.Byte cannot be cast to…
     3.1.3      timetravel       FAILED         java.lang.NullPointerException
-    3.2.3      cdc              FAILED         java.lang.ClassCastException: class java.lang.Byte cannot be cast to…
-    3.2.3      incremental      FAILED         java.lang.NullPointerException
-    3.2.3      read_optimized   SUCCESS        
-    3.2.3      snapshot         FAILED         java.lang.ClassCastException: class java.lang.Byte cannot be cast to…
-    3.2.3      timetravel       FAILED         java.lang.NullPointerException
-    3.3.1      cdc              FAILED         java.lang.ClassCastException: class java.lang.Byte cannot be cast to…
-    3.3.1      incremental      FAILED         java.lang.NullPointerException
-    3.3.1      read_optimized   SUCCESS        
-    3.3.1      snapshot         FAILED         java.lang.ClassCastException: class java.lang.Byte cannot be cast to…
-    3.3.1      timetravel       FAILED         java.lang.NullPointerException
+    3.2.4      cdc              FAILED         java.lang.ClassCastException: class java.lang.Byte cannot be cast to…
+    3.2.4      incremental      FAILED         java.lang.NullPointerException
+    3.2.4      read_optimized   FAILED         java.lang.IllegalArgumentException: For input string: "null"
+    3.2.4      snapshot         FAILED         java.lang.IllegalArgumentException: For input string: "null"
+    3.2.4      timetravel       FAILED         java.lang.NullPointerException
+    3.3.3      cdc              FAILED         java.lang.ClassCastException: class java.lang.Byte cannot be cast to…
+    3.3.3      incremental      FAILED         java.lang.NullPointerException
+    3.3.3      read_optimized   FAILED         java.lang.IllegalArgumentException: For input string: "null"
+    3.3.3      snapshot         FAILED         java.lang.IllegalArgumentException: For input string: "null"
+    3.3.3      timetravel       FAILED         java.lang.NullPointerException
     3.4.1      cdc              FAILED         It isn't a CDC hudi table on file:/tmp/cdc_hudi_trips_mor_table_0_12_…
     3.4.1      incremental      SUCCESS        
     3.4.1      read_optimized   SUCCESS        
@@ -98,34 +90,24 @@ HUDI UPGRADE TEST — Baseline vs Upgrade Insights
     Spark      Query type       Baseline   Upgrade    Count OK?
     ----------------------------------------------------------------------
     3.1.3      read_optimized   20         25         ✓
-    3.2.3      read_optimized   20         25         ✓
-    3.3.1      read_optimized   20         25         ✓
-    3.4.1      incremental      6          11         ✓
+    3.4.1      incremental      6          10         ✓
     3.4.1      read_optimized   20         25         ✓
     3.4.1      snapshot         20         22         ✓
     3.4.1      timetravel       20         20         ✓
-    3.5.3      incremental      6          11         ✓
+    3.5.3      incremental      6          10         ✓
     3.5.3      read_optimized   20         25         ✓
     3.5.3      snapshot         20         22         ✓
     3.5.3      timetravel       20         20         ✓
 
   Status summary:
-    Baseline:  33/35 passed, 2 failed
-    Upgrade:   13/35 passed, 22 failed
+    Baseline:  13/25 passed, 12 failed
+    Upgrade:   9/25 passed, 16 failed
 
   Regressions (passed in baseline, failed in upgrade):
     3.1.3 / cdc: java.lang.ClassCastException: class java.lang.Byte cannot b…
     3.1.3 / incremental: java.lang.NullPointerException
     3.1.3 / snapshot: java.lang.ClassCastException: class java.lang.Byte cannot b…
     3.1.3 / timetravel: java.lang.NullPointerException
-    3.2.3 / cdc: java.lang.ClassCastException: class java.lang.Byte cannot b…
-    3.2.3 / incremental: java.lang.NullPointerException
-    3.2.3 / snapshot: java.lang.ClassCastException: class java.lang.Byte cannot b…
-    3.2.3 / timetravel: java.lang.NullPointerException
-    3.3.1 / cdc: java.lang.ClassCastException: class java.lang.Byte cannot b…
-    3.3.1 / incremental: java.lang.NullPointerException
-    3.3.1 / snapshot: java.lang.ClassCastException: class java.lang.Byte cannot b…
-    3.3.1 / timetravel: java.lang.NullPointerException
 
   Baseline table version: 5
   Upgrade table version:  6
@@ -140,12 +122,12 @@ HUDI UPGRADE TEST — Baseline vs Upgrade Insights
     3.1.3      incremental      SUCCESS        
     3.1.3      snapshot         SUCCESS        
     3.1.3      timetravel       SUCCESS        
-    3.2.3      incremental      SUCCESS        
-    3.2.3      snapshot         SUCCESS        
-    3.2.3      timetravel       SUCCESS        
-    3.3.1      incremental      SUCCESS        
-    3.3.1      snapshot         SUCCESS        
-    3.3.1      timetravel       SUCCESS        
+    3.2.4      incremental      FAILED         java.lang.NullPointerException
+    3.2.4      snapshot         FAILED         java.lang.IllegalArgumentException: For input string: "null"
+    3.2.4      timetravel       FAILED         java.lang.NullPointerException
+    3.3.3      incremental      FAILED         java.lang.NullPointerException
+    3.3.3      snapshot         FAILED         java.lang.IllegalArgumentException: For input string: "null"
+    3.3.3      timetravel       FAILED         java.lang.NullPointerException
     3.4.1      incremental      SUCCESS        
     3.4.1      snapshot         SUCCESS        
     3.4.1      timetravel       SUCCESS        
@@ -160,12 +142,6 @@ HUDI UPGRADE TEST — Baseline vs Upgrade Insights
     3.1.3      incremental      6          11         ✓
     3.1.3      snapshot         20         22         ✓
     3.1.3      timetravel       20         20         ✓
-    3.2.3      incremental      6          11         ✓
-    3.2.3      snapshot         20         22         ✓
-    3.2.3      timetravel       20         20         ✓
-    3.3.1      incremental      6          11         ✓
-    3.3.1      snapshot         20         22         ✓
-    3.3.1      timetravel       20         20         ✓
     3.4.1      incremental      6          11         ✓
     3.4.1      snapshot         20         22         ✓
     3.4.1      timetravel       20         20         ✓
@@ -174,8 +150,8 @@ HUDI UPGRADE TEST — Baseline vs Upgrade Insights
     3.5.3      timetravel       20         20         ✓
 
   Status summary:
-    Baseline:  21/21 passed, 0 failed
-    Upgrade:   21/21 passed, 0 failed
+    Baseline:  9/15 passed, 6 failed
+    Upgrade:   9/15 passed, 6 failed
 
   Baseline table version: 5
   Upgrade table version:  6
@@ -191,14 +167,14 @@ HUDI UPGRADE TEST — Baseline vs Upgrade Insights
     3.1.3      read_optimized   SUCCESS        
     3.1.3      snapshot         FAILED         java.lang.ClassCastException: class java.lang.Float cannot be cast to…
     3.1.3      timetravel       FAILED         java.lang.NullPointerException
-    3.2.3      incremental      FAILED         java.lang.NullPointerException
-    3.2.3      read_optimized   SUCCESS        
-    3.2.3      snapshot         FAILED         java.lang.ClassCastException: class java.lang.Float cannot be cast to…
-    3.2.3      timetravel       FAILED         java.lang.NullPointerException
-    3.3.1      incremental      FAILED         java.lang.NullPointerException
-    3.3.1      read_optimized   SUCCESS        
-    3.3.1      snapshot         FAILED         java.lang.ClassCastException: class java.lang.Float cannot be cast to…
-    3.3.1      timetravel       FAILED         java.lang.NullPointerException
+    3.2.4      incremental      FAILED         java.lang.NullPointerException
+    3.2.4      read_optimized   FAILED         java.lang.IllegalArgumentException: For input string: "null"
+    3.2.4      snapshot         FAILED         java.lang.IllegalArgumentException: For input string: "null"
+    3.2.4      timetravel       FAILED         java.lang.NullPointerException
+    3.3.3      incremental      FAILED         java.lang.NullPointerException
+    3.3.3      read_optimized   FAILED         java.lang.IllegalArgumentException: For input string: "null"
+    3.3.3      snapshot         FAILED         java.lang.IllegalArgumentException: For input string: "null"
+    3.3.3      timetravel       FAILED         java.lang.NullPointerException
     3.4.1      incremental      SUCCESS        
     3.4.1      read_optimized   SUCCESS        
     3.4.1      snapshot         SUCCESS        
@@ -213,31 +189,23 @@ HUDI UPGRADE TEST — Baseline vs Upgrade Insights
     Spark      Query type       Baseline   Upgrade    Count OK?
     ----------------------------------------------------------------------
     3.1.3      read_optimized   20         25         ✓
-    3.2.3      read_optimized   20         25         ✓
-    3.3.1      read_optimized   20         25         ✓
-    3.4.1      incremental      6          8          ✓
+    3.4.1      incremental      6          9          ✓
     3.4.1      read_optimized   20         25         ✓
     3.4.1      snapshot         20         22         ✓
     3.4.1      timetravel       20         20         ✓
-    3.5.3      incremental      6          8          ✓
+    3.5.3      incremental      6          9          ✓
     3.5.3      read_optimized   20         25         ✓
     3.5.3      snapshot         20         22         ✓
     3.5.3      timetravel       20         20         ✓
 
   Status summary:
-    Baseline:  28/28 passed, 0 failed
-    Upgrade:   13/28 passed, 15 failed
+    Baseline:  12/20 passed, 8 failed
+    Upgrade:   9/20 passed, 11 failed
 
   Regressions (passed in baseline, failed in upgrade):
     3.1.3 / incremental: java.lang.NullPointerException
     3.1.3 / snapshot: java.lang.ClassCastException: class java.lang.Float cannot…
     3.1.3 / timetravel: java.lang.NullPointerException
-    3.2.3 / incremental: java.lang.NullPointerException
-    3.2.3 / snapshot: java.lang.ClassCastException: class java.lang.Float cannot…
-    3.2.3 / timetravel: java.lang.NullPointerException
-    3.3.1 / incremental: java.lang.NullPointerException
-    3.3.1 / snapshot: java.lang.ClassCastException: class java.lang.Float cannot…
-    3.3.1 / timetravel: java.lang.NullPointerException
 
   Baseline table version: 5
   Upgrade table version:  6

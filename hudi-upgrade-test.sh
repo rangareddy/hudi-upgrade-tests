@@ -30,9 +30,8 @@ if [[ -f "$PROPERTIES_FILE" ]]; then
   source "$PROPERTIES_FILE"
   set +a
 else
-  SOURCE_HUDI_VERSION=0.12.3
-  SCALA_VERSION=2.12
-  TARGET_HUDI_VERSION=0.15.0
+  echo "${PROPERTIES_FILE} file not found"
+  exit 1
 fi
 
 SOURCE_HUDI_VERSION_CLEAN=${SOURCE_HUDI_VERSION//./_}
@@ -64,12 +63,12 @@ spark_run() {
     local spark_version_str="${spark_version//./}"
     local spark_home_var="SPARK${spark_version_str}_HOME"
     local spark_home="${!spark_home_var:-}"
-
+    spark_version=$(echo $spark_version | cut -d'.' -f1,2)
     if [[ -n "$spark_home" && -d "$spark_home" ]]; then
         log "Using SPARK_HOME: $spark_home"
         export SPARK_HOME="$spark_home"
     else
-        log "No SPARK${spark_version_str}_HOME found"
+        error "No SPARK${spark_version_str}_HOME found"
         exit 1
     fi
     
@@ -120,7 +119,7 @@ main() {
     log "🔍 STEP 2: Baseline Query Tests (Pre-Upgrade)"
     for version_pair in "${all_versions[@]}"; do
         IFS=',' read -r spark_version hudi_version <<< "$version_pair"
-        log "Spark ${spark_version} + Hudi ${hudi_version}"
+        log "Running baseline test with Spark ${spark_version} + Hudi ${hudi_version}"
         spark_run "${spark_version}" "${hudi_version}" "${SCALA_VERSION}" \
                   "${QUERY_TESTER}" \
                   "${TABLE_TYPE}" "${IS_CDC}" $BASELINE
@@ -142,7 +141,7 @@ main() {
     log "✅ STEP 4: Post-Upgrade Query Tests"
     for version_pair in "${all_versions[@]}"; do
         IFS=',' read -r spark_version hudi_version <<< "$version_pair"
-        log "Spark ${spark_version} + Hudi ${hudi_version}"
+        log "Running upgrade test with Spark ${spark_version} + Hudi ${hudi_version}"
         spark_run "${spark_version}" "${hudi_version}" "${SCALA_VERSION}" \
                   "${QUERY_TESTER}" \
                   "${TABLE_TYPE}" "${IS_CDC}" "${UPGRADE}"
