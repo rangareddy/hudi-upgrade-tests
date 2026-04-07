@@ -61,11 +61,13 @@ def get_table_details(tableType, is_cdc_table):
 ############################################
 
 def create_spark_session():
-    """Create Spark session with Hudi support"""
+    """Create Spark session with Hudi support (fixed shuffle partitions for reproducible plans)."""
     spark = SparkSession.builder \
         .appName("hudi_upgrade_query_validation") \
         .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer") \
         .config("spark.sql.extensions", "org.apache.spark.sql.hudi.HoodieSparkSessionExtension") \
+        .config("spark.sql.shuffle.partitions", "2") \
+        .config("spark.default.parallelism", "2") \
         .getOrCreate()
     return spark
 
@@ -75,17 +77,20 @@ def create_spark_session():
 ############################################
 
 def get_hudi_version(spark):
-    """Extract Hudi version from JARs"""
+    """Extract Hudi version from JARs (sorted paths for stable choice if multiple match)."""
     hudi_version = "UNKNOWN"
     try:
         jars = spark.sparkContext._jsc.sc().listJars()
         iterator = jars.iterator()
+        candidates = []
         while iterator.hasNext():
             jar = str(iterator.next())
             if "hudi" in jar and "bundle" in jar:
-                jar_name = jar.split("/")[-1]
-                hudi_version = jar_name.split("-")[-1].replace(".jar", "")
-                break
+                candidates.append(jar)
+        if candidates:
+            jar = sorted(candidates)[0]
+            jar_name = jar.split("/")[-1]
+            hudi_version = jar_name.split("-")[-1].replace(".jar", "")
     except Exception as e:
         logger.error(f"Error extracting Hudi version: {e}")
     logger.info(f"Hudi version: {hudi_version}")
@@ -242,7 +247,6 @@ def run_validation(spark, basePath, query_types, beginInstant,
             "status": status,
             "count": count,
             "error_message": error_message,
-            "run_mode": run_mode
         })
 
     return results
@@ -300,17 +304,30 @@ def print_results(results):
 # Write Results to CSV
 ############################################
 
+CSV_FIELDNAMES = [
+    "run_mode",
+    "spark_version",
+    "hudi_version",
+    "table_version",
+    "table_type",
+    "table_name",
+    "is_cdc",
+    "query_type",
+    "status",
+    "count",
+    "error_message",
+]
+
+
 def write_results_to_csv(tableName, run_mode, results):
-    """Append results to CSV file"""
+    """Append results to CSV file with stable column order."""
     results_dir = os.path.join(working_dir, "results")
     os.makedirs(results_dir, exist_ok=True)
     file_name = os.path.join(results_dir, f"{tableName}_{run_mode}.csv")
     file_exists = os.path.isfile(file_name)
 
-    header = results[0].keys()
-
     with open(file_name, "a", newline="") as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=header)
+        writer = csv.DictWriter(csvfile, fieldnames=CSV_FIELDNAMES, extrasaction="ignore")
 
         if not file_exists:
             writer.writeheader()
