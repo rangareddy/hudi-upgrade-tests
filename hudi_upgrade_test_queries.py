@@ -153,8 +153,30 @@ def get_begin_instant(spark, basePath):
         return None
 
 
+def normalize_java_exception_for_csv(msg: str) -> str:
+    """
+    Canonicalize Java exception text so the same failure matches across JDKs and Py4J chains.
+    JDK 9+ uses 'class java.lang.X cannot be cast to class [L...' and appends (module/loader...);
+    older/shorter messages omit 'class ' and the parenthetical.
+    """
+    if not msg:
+        return msg
+    t = msg.strip()
+    # Drop trailing JDK 9+ parenthetical (modules / loaders) after the cast message
+    t = re.sub(
+        r"\s+\(\s*java\.[\w$.]+\s+is\s+in\s+module\b.*\)\s*$",
+        "",
+        t,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    t = re.sub(r"\bclass (java\.[\w$]+(?:\.[\w$]+)*)", r"\1", t)
+    t = re.sub(r"\bclass (\[L[\w.$]+;)", r"\1", t)
+    t = re.sub(r"\s+", " ", t).strip()
+    return t
+
+
 def extract_root_java_exception(error):
-    """Extract root Java exception from Spark error"""
+    """Extract root Java exception from Spark error (stable string for CSV diffing)."""
     error_str = str(error)
 
     # Java exceptions
@@ -164,7 +186,7 @@ def extract_root_java_exception(error):
     )
 
     if matches:
-        return matches[-1].strip()   # return deepest java exception
+        return normalize_java_exception_for_csv(matches[-1].strip())
 
     # Spark exceptions
     spark_match = re.search(
@@ -173,10 +195,10 @@ def extract_root_java_exception(error):
     )
 
     if spark_match:
-        return spark_match.group(1)
+        return normalize_java_exception_for_csv(spark_match.group(1))
 
     # fallback to first line
-    return error_str.split("\n")[0]
+    return normalize_java_exception_for_csv(error_str.split("\n")[0])
 
 
 ############################################
